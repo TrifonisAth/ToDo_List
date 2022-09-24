@@ -130,13 +130,18 @@ function checkClick(event, option1, option2, project) {
 }
 
 function deleteProject(project) {
-  console.log("delete");
+  for (i = 1; i < projectsTab.children.length; i++) {
+    if (projectsTab.children[i].classList.contains("selected-tab"))
+      projectsTab.removeChild(projectsTab.children[i]);
+  }
+  contentTitle.textContent = "";
 }
 
-function renameProject(project) {}
+function renameProject(project) {
+  project.classList.add("hidden");
+}
 
 function removeDialog(el) {
-  project.lastElementChild.classList.contains("options-panel");
-  el.removeChild(el.lastElementChild);
-  console.log("remove dialog");
+  if (el.lastElementChild.classList.contains("options-panel"))
+    el.removeChild(el.lastElementChild);
 }

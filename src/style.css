@@ -113,10 +113,6 @@ h1 > span {
   background-color: #118f55;
 }
 
-.hidden {
-  display: none;
-}
-
 .selected {
   background-color: #118f55;
 }
@@ -188,4 +184,8 @@ input {
 .options-panel > *:hover {
   background-color: black;
   color: goldenrod;
+}
+
+.hidden {
+  display: none;
 }
