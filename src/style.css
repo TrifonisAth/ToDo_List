@@ -1,0 +1,191 @@
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #154c79;
+  color: whitesmoke;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-size: 1.1rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 6vh;
+}
+
+#logo {
+  width: 3rem;
+  justify-items: center;
+  background-color: #ffccee;
+  border-radius: 1.5rem;
+}
+
+#menu {
+  width: 5rem;
+  height: 5rem;
+}
+
+h1 > span {
+  color: #ffcc00;
+}
+
+.home > * {
+  display: flex;
+  align-items: center;
+}
+
+.projects > * {
+  display: flex;
+  align-items: center;
+}
+
+.side-logo {
+  width: 2rem;
+  height: 2rem;
+  align-self: center;
+  background-color: lightgoldenrodyellow;
+  margin: 1rem 0.7rem 1rem 2rem;
+}
+
+.project-dot {
+  background-color: #711f30;
+  border-radius: 1.5rem;
+}
+
+.container-small {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.side-panel {
+  padding-left: 1rem;
+  background-color: #711f30;
+  flex: 1 1 300px;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+#add {
+  border-radius: 1.5rem;
+}
+
+.content {
+  min-width: 400px;
+  width: 70vw;
+  min-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  background-color: #033c59;
+  padding: 2rem;
+}
+
+.content > * {
+  width: 100%;
+  border-radius: 1rem;
+}
+
+#content-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 1rem 1.7rem;
+}
+
+.title {
+  background-color: #118f55;
+}
+
+.hidden {
+  display: none;
+}
+
+.selected {
+  background-color: #118f55;
+}
+
+.home > *:hover,
+.projects > *:hover {
+  background-color: gray;
+  cursor: pointer;
+}
+
+button {
+  padding: 0.8rem;
+  color: white;
+  font-size: 1.1rem;
+  margin: 0.7rem;
+}
+
+button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+input {
+  font-size: 1.2rem;
+}
+
+.project-prompt {
+  display: flex;
+  flex-direction: column;
+}
+
+.red-btn {
+  background-color: red;
+}
+
+.green-btn {
+  background-color: #118f55;
+}
+
+.selected-tab {
+  font-weight: 700;
+  font-size: 1.15rem;
+  background-color: #184f35;
+}
+
+.project {
+  display: flex;
+  position: relative;
+}
+
+.project > p {
+  flex-grow: 1;
+}
+
+.settings {
+  width: 2rem;
+  margin-right: 1rem;
+}
+
+.options-panel {
+  width: 6rem;
+  padding: 0.2rem 1rem;
+  background-color: #444444;
+  position: absolute;
+  right: 6rem;
+  top: -4rem;
+}
+
+.options-panel > *:hover {
+  background-color: black;
+  color: goldenrod;
+}
