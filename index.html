@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../src/style.css" />
+    <script src="bundle.js" defer></script>
+    <title>Todo List</title>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <img src="../src/menu.png" alt="menu" id="menu" />
+        <h1>JUST <span>ToDo </span>IT.</h1>
+        <div><div></div></div>
+      </header>
+      <div class="container-small">
+        <div class="side-panel">
+          <h2 id="home-title">Home</h2>
+          <div class="home">
+            <div class="all-tasks home-tab selected-tab">
+              <img
+                src="../src/allTasks.png"
+                alt="all tasks"
+                class="side-logo"
+              />
+              <p>All Tasks</p>
+            </div>
+            <div class="today-tasks home-tab">
+              <img src="../src/today.png" alt="today tasks" class="side-logo" />
+              <p>Today</p>
+            </div>
+            <div class="next-week home-tab">
+              <img src="../src/7days.png" alt="next week" class="side-logo" />
+              <p>Next Week</p>
+            </div>
+            <div class="important home-tab">
+              <img
+                src="../src/important.png"
+                alt="important"
+                class="side-logo"
+              />
+              <p>Important</p>
+            </div>
+          </div>
+          <h2 id="projects-title">Projects</h2>
+          <div class="projects">
+            <div class="add-project">
+              <img src="../src/add.png" alt="add" class="side-logo" id="add" />
+              <p id="add-project">Add Project</p>
+            </div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="title">
+            <p id="content-title">Content Title</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
