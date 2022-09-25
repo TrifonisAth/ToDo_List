@@ -10,16 +10,16 @@ const nextWeekTasksTab = document.querySelector(".next-week");
 const importantTasksTab = document.querySelector(".important");
 
 let currentTab = allTasksTab;
-
+let openDialog = null;
 tabs[0].onclick = () => changeTab(allTasksTab);
 tabs[1].onclick = () => changeTab(todayTasksTab);
 tabs[2].onclick = () => changeTab(nextWeekTasksTab);
 tabs[3].onclick = () => changeTab(importantTasksTab);
 
 let inputProject;
-
+contentDisplay(currentTab);
 menuBtn.onclick = showMenu;
-addBtn.onclick = addProject;
+addBtn.onclick = () => addProject();
 
 function contentDisplay(tab) {
   tab.classList.add("selected-tab");
@@ -32,8 +32,8 @@ function showMenu() {
   sideBtn.classList.toggle("hidden");
 }
 
-// Project adding name prompt.
-function addProject() {
+// Project adding name prompt. Arg is stating if it is a rename prompt instead aof a new project.
+function addProject(event, project, arg = false) {
   addBtn.onclick = null;
   const input = document.createElement("input");
   const redBtn = document.createElement("button");
@@ -45,7 +45,7 @@ function addProject() {
   redBtn.classList.add("red-btn");
   redBtn.textContent = "Cancel";
   greenBtn.classList.add("green-btn");
-  greenBtn.textContent = "Add";
+  greenBtn.textContent = arg !== true ? "Add" : "Rename";
 
   input.setAttribute("type", "text");
   input.setAttribute("placeholder", "Project Name");
@@ -55,9 +55,14 @@ function addProject() {
   input.setAttribute("autocomplete", "off");
 
   buttons.classList.add("buttons");
-
+  if (arg) {
+    redBtn.addEventListener("click", () =>
+      cancelOption(undefined, project, true)
+    );
+  } else {
+    redBtn.addEventListener("click", cancelOption);
+  }
   greenBtn.addEventListener("click", addOption);
-  redBtn.addEventListener("click", cancelOption);
 
   buttons.appendChild(greenBtn);
   buttons.appendChild(redBtn);
@@ -67,9 +72,14 @@ function addProject() {
   inputProject = input;
 }
 
-// Create project.
-function addOption() {
+// Create project. If arg === true rename existing project.
+function addOption(param, arg = false) {
   addBtn.onclick = addProject;
+  if (arg) {
+    console.log("hey");
+    projectsTab.removeChild(projectsTab.lastChild);
+  }
+
   const project = document.createElement("div");
   project.classList.add("project");
   project.insertAdjacentHTML(
@@ -93,9 +103,15 @@ function addOption() {
 }
 
 // Cancel project creation.
-function cancelOption() {
+function cancelOption(event, project, arg = false) {
   addBtn.onclick = addProject;
-  projectsTab.removeChild(projectsTab.lastElementChild);
+  if (arg) {
+    project.classList.remove("hidden");
+    projectsTab.removeChild(projectsTab.lastChild);
+  } else {
+    projectsTab.removeChild(projectsTab.lastChild);
+    console.log("cancel creation");
+  }
 }
 
 function changeTab(selectedTab) {
@@ -106,8 +122,12 @@ function changeTab(selectedTab) {
 }
 
 function settingsClicked(project, e) {
+  if (openDialog !== null && openDialog !== project) removeDialog(openDialog);
+  openDialog = project;
   // Avoid triggering the document click event that will be added.
   e.stopPropagation();
+  //   console.log(project);
+
   const options = document.createElement("div");
   options.classList.add("options-panel");
   const renameProjectPara = document.createElement("p");
@@ -123,6 +143,7 @@ function settingsClicked(project, e) {
 }
 
 function checkClick(event, option1, option2, project) {
+  console.log(openDialog === project);
   if (event.target == option1) renameProject(project);
   if (event.target == option2) deleteProject(project);
   // You might want to remove the listener!!!
@@ -134,11 +155,14 @@ function deleteProject(project) {
     if (projectsTab.children[i].classList.contains("selected-tab"))
       projectsTab.removeChild(projectsTab.children[i]);
   }
-  contentTitle.textContent = "";
+  changeTab(todayTasksTab); // Display today's content.
 }
 
 function renameProject(project) {
-  project.classList.add("hidden");
+  const projectName = project.children[1].textContent;
+  project.classList.add("hidden"); // Remove hidden class in final steps!! -----
+  addProject(undefined, project, true);
+  projectsTab.lastChild.children[0].value = projectName; // Input placeholder = project old name.
 }
 
 function removeDialog(el) {
