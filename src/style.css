@@ -139,16 +139,16 @@ input {
   font-size: 1.2rem;
 }
 
-.project-prompt {
+.prompt {
   display: flex;
   flex-direction: column;
 }
 
-.red-btn {
+.red {
   background-color: red;
 }
 
-.green-btn {
+.green {
   background-color: #118f55;
 }
 
