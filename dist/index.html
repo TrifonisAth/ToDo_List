@@ -84,6 +84,36 @@
           <div class="title">
             <p id="content-title"></p>
           </div>
+          <div class="add-task hidden">
+            <img
+              src="../src/add.png"
+              alt="add-task"
+              id="add-task"
+              class="side-logo"
+            />
+            <p class="add-task-para">Add Task</p>
+          </div>
+          <form class="hidden">
+            <p class="task-title">Title:</p>
+            <input
+              type="text"
+              placeholder="What to do?"
+              maxlength="30"
+              required
+            />
+            <p class="task-title">Details (optional):</p>
+            <input
+              type="text"
+              placeholder="Some datails about the task"
+              maxlength="30"
+            />
+            <p class="task-title">Date:</p>
+            <input type="date" maxlength="30" required />
+            <div class="buttons">
+              <button class="green">Add</button
+              ><button class="red" type="button">Cancel</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
