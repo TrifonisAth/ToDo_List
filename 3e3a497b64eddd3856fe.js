@@ -25,7 +25,7 @@ function updatesessionStorageProjectList() {
   sessionStorage.setObject("projectsList", projects);
 }
 
-function updatesessionStorageId() {
+function updateSessionStorageId() {
   sessionStorage.setItem("currentId", currentId);
 }
 
@@ -200,8 +200,8 @@ document.addEventListener("click", (e) => {
 function createProject() {
   addProject(new Project(promptInput.value));
   hideProjectPrompt();
-  updatesessionStorageId();
-  updatesessionStorageProjectList();
+  updateSessionStorageId();
+  updateSessionStorageProjectList();
   loadProjects("single");
 }
 
@@ -295,7 +295,7 @@ function deleteProject(project) {
   // Clear projectTab and reload projects.
   clearProjectTab();
   loadProjects();
-  updatesessionStorageProjectList();
+  updateSessionStorageProjectList();
   openDialog = null;
   changeTab(todayTasksTab, true);
   project.onclick = null;
@@ -330,7 +330,7 @@ function removeDialog(el) {
 function renameProject() {
   // Update data.
   projectRenamer(openRename.children[1].textContent, renameInput.value);
-  updatesessionStorageProjectList();
+  updateSessionStorageProjectList();
   // Update html content.
   openRename.children[1].textContent = renameInput.value;
   cancelRename();
@@ -409,7 +409,7 @@ function createTask() {
   };
   project.taskList.push(task);
   updateLocalTaskId();
-  updatesessionStorageProjectList();
+  updateSessionStorageProjectList();
   cancelTaskPrompt();
   clearContent(); // Testing needed
   taskDisplay(); // Testing needed.
