@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="57011448dc08b9372b5e.css" />
-    <script src="354b96fd7ace198512ec.js" defer></script>
+    <script src="4a9d3e383142f91e5aea.js" defer></script>
     <title>Todo List</title>
   <script defer src="bundle.js"></script></head>
   <body>
@@ -99,6 +99,7 @@
               type="text"
               placeholder="What to do?"
               maxlength="30"
+              id="task-name"
               required
             />
             <p class="task-title">Details (optional):</p>
@@ -106,12 +107,15 @@
               type="text"
               placeholder="Some datails about the task"
               maxlength="30"
+              id="task-details"
             />
             <p class="task-title">Date:</p>
-            <input type="date" maxlength="30" required />
+            <input type="date" maxlength="30" id="task-date" required />
             <div class="buttons">
-              <button class="green">Add</button
-              ><button class="red" type="button">Cancel</button>
+              <button class="green" type="button" id="task-add-btn">Add</button
+              ><button class="red" type="button" id="task-cancel-btn">
+                Cancel
+              </button>
             </div>
           </form>
         </div>
