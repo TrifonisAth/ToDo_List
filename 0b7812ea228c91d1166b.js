@@ -14,23 +14,23 @@ Storage.prototype.getObject = function (key) {
   return value && JSON.parse(value);
 };
 
-// Set value to 0 or localStorage saved, if it exists.
-let currentId = localStorage.getObject("currentId") || 0;
-// Set value to empty array or localStorage saved, if it exists.
-let projects = localStorage.getObject("projectsList") || [];
+// Set value to 0 or SessionStorage saved, if it exists.
+let currentId = SessionStorage.getObject("currentId") || 0;
+// Set value to empty array or SessionStorage saved, if it exists.
+let projects = SessionStorage.getObject("projectsList") || [];
 
-let currenTaskId = localStorage.getObject("currentTaskId") || 0;
+let currenTaskId = SessionStorage.getObject("currentTaskId") || 0;
 
-function updateLocalStorageProjectList() {
-  localStorage.setObject("projectsList", projects);
+function updateSessionStorageProjectList() {
+  SessionStorage.setObject("projectsList", projects);
 }
 
-function updateLocalStorageId() {
-  localStorage.setItem("currentId", currentId);
+function updateSessionStorageId() {
+  SessionStorage.setItem("currentId", currentId);
 }
 
 function updateLocalTaskId() {
-  localStorage.setItem("currentTaskId", currenTaskId);
+  SessionStorage.setItem("currentTaskId", currenTaskId);
 }
 
 /////////////////////////////////////
@@ -200,8 +200,8 @@ document.addEventListener("click", (e) => {
 function createProject() {
   addProject(new Project(promptInput.value));
   hideProjectPrompt();
-  updateLocalStorageId();
-  updateLocalStorageProjectList();
+  updateSessionStorageId();
+  updateSessionStorageProjectList();
   loadProjects("single");
 }
 
@@ -295,7 +295,7 @@ function deleteProject(project) {
   // Clear projectTab and reload projects.
   clearProjectTab();
   loadProjects();
-  updateLocalStorageProjectList();
+  updateSessionStorageProjectList();
   openDialog = null;
   changeTab(todayTasksTab, true);
   project.onclick = null;
@@ -330,7 +330,7 @@ function removeDialog(el) {
 function renameProject() {
   // Update data.
   projectRenamer(openRename.children[1].textContent, renameInput.value);
-  updateLocalStorageProjectList();
+  updateSessionStorageProjectList();
   // Update html content.
   openRename.children[1].textContent = renameInput.value;
   cancelRename();
@@ -409,7 +409,7 @@ function createTask() {
   };
   project.taskList.push(task);
   updateLocalTaskId();
-  updateLocalStorageProjectList();
+  updateSessionStorageProjectList();
   cancelTaskPrompt();
   clearContent(); // Testing needed
   taskDisplay(); // Testing needed.
