@@ -21,7 +21,7 @@ let projects = sessionStorage.getObject("projectsList") || [];
 
 let currenTaskId = sessionStorage.getObject("currentTaskId") || 0;
 
-function updatesessionStorageProjectList() {
+function updateSessionStorageProjectList() {
   sessionStorage.setObject("projectsList", projects);
 }
 
