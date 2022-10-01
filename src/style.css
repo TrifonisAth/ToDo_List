@@ -204,6 +204,11 @@ input {
   align-items: center;
 }
 
+.add-task:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 #add-task {
   border-radius: 1rem;
 }
@@ -228,4 +233,42 @@ button {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+}
+
+.task {
+  display: flex;
+  flex-direction: column;
+  border: 0.2rem solid white;
+  margin: 1rem;
+  padding: 0.8rem;
+}
+
+.task > * {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top {
+  height: 30%;
+}
+
+.top > .task-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ffcc00;
+}
+.group {
+  display: flex;
+  align-items: center;
+}
+
+.group > * {
+  margin: 0 0.5rem;
+}
+
+.task img {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0.5rem;
 }

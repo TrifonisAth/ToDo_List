@@ -2,6 +2,8 @@ import "./style.css";
 import "./index.html";
 import Settings from "./settings.png";
 import Dot from "./dot.png";
+import Unimportant from "./star.png";
+import Fav from "./important.png";
 
 Storage.prototype.setObject = function (key, value) {
   this.setItem(key, JSON.stringify(value));
@@ -31,18 +33,29 @@ function addProject(project) {
   projects.push(project);
 }
 
-function removeProject(projectIndex) {
-  projects.splice(projectIndex, 1);
+function removeProject(id) {
+  for (let i = 0; i < projects.length; i++) {
+    if (projects[i].id == id) {
+      projects.splice(i, 1);
+      break;
+    }
+  }
 }
 
 function findProject(projectName) {
   for (let i = 0; i < projects.length; i++) {
-    if (projects[i].getName() === projectName) return projects[i];
+    if (projects[i].name === projectName) return projects[i];
+  }
+}
+
+function findProjectById(pid) {
+  for (let i = 0; i < projects.length; i++) {
+    if (projects[i].id == pid) return projects[i];
   }
 }
 
 const projectRenamer = (oldName, newName) => {
-  findProject(oldName).setName(newName);
+  findProject(oldName).name = newName;
 };
 
 class Project {
@@ -121,6 +134,7 @@ class Task {
 
 const addBtn = document.querySelector(".add-project");
 const projectsTab = document.querySelector(".projects");
+const content = document.querySelector(".content");
 const contentTitle = document.getElementById("content-title");
 const sideBtn = document.querySelector(".side-panel");
 const menuBtn = document.getElementById("menu");
@@ -137,6 +151,13 @@ const renamePrompt = document.querySelector(".rename-prompt");
 const renameInput = renamePrompt.querySelector("input");
 const renameGreenBtn = renamePrompt.querySelector(".rename-btn");
 const renameRedBtn = renamePrompt.querySelector(".cancel-btn");
+const openTaskPrompt = document.querySelector(".add-task");
+const formTask = document.querySelector("form");
+const taskNameInput = document.getElementById("task-name");
+const taskDetailsInput = document.getElementById("task-details");
+const taskDateInput = document.getElementById("task-date");
+const taskAddBtn = document.getElementById("task-add-btn");
+const taskCancelBtn = document.getElementById("task-cancel-btn");
 
 let currentTab = allTasksTab;
 contentDisplay(currentTab);
@@ -155,14 +176,14 @@ addBtn.onclick = () => {
   projectPrompt.classList.remove("hidden");
   promptInput.focus();
 };
-promptRedBtn.onclick = () => {
-  projectPrompt.classList.add("hidden");
-  promptInput.value = "";
-};
+promptRedBtn.onclick = hideProjectPrompt;
 
 promptGreenBtn.onclick = createProject;
 renameGreenBtn.onclick = renameProject;
 renameRedBtn.onclick = cancelRename;
+openTaskPrompt.onclick = clickOpenTaskPrompt;
+taskAddBtn.onclick = createTask;
+taskCancelBtn.onclick = cancelTaskPrompt;
 
 document.addEventListener("click", (e) => {
   if (openDialog === null) return;
@@ -172,13 +193,18 @@ document.addEventListener("click", (e) => {
 
 function createProject() {
   addProject(new Project(promptInput.value));
-  projectPrompt.classList.add("hidden");
-  promptInput.value = "";
+  hideProjectPrompt();
   updateLocalStorageId();
   updateLocalStorageProjectList();
   loadProjects("single");
 }
-// loadProjects();
+
+function hideProjectPrompt() {
+  projectPrompt.classList.add("hidden");
+  promptInput.value = "";
+}
+
+loadProjects();
 
 // Load the projects into html.
 function loadProjects(arg) {
@@ -187,6 +213,7 @@ function loadProjects(arg) {
     if (arg === "single") i = projects.length - 1;
     const proj = projects[i];
     const div = document.createElement("div");
+    div.dataset.id = proj.id; // Bug here!
     div.classList.add("project");
     const dot = new Image();
     dot.src = Dot;
@@ -194,7 +221,7 @@ function loadProjects(arg) {
     dot.setAttribute("class", "side-logo project-dot");
     div.insertAdjacentElement("afterbegin", dot);
     const p = document.createElement("p");
-    p.textContent = proj.getName();
+    p.textContent = proj["name"];
     p.classList.add("project-name");
     div.appendChild(p);
     const settings = new Image();
@@ -210,13 +237,13 @@ function loadProjects(arg) {
     // Exit loop after 1 rep, if arg === 'single'
     if (arg === "single") break;
   }
-  console.log(projects);
 }
 
 function contentDisplay(tab) {
   tab.classList.add("selected-tab");
   // The 2nd element is always a <p> with the tab's title.
   contentTitle.textContent = tab.children[1].textContent;
+  clearContent(); // Test maybe bugs here.
 }
 
 // Show/Hide menu.
@@ -229,6 +256,9 @@ function changeTab(selectedTab, bool) {
   currentTab.classList.remove("selected-tab");
   currentTab = selectedTab;
   contentDisplay(currentTab);
+  if (selectedTab.classList.contains("project")) {
+    taskDisplay();
+  } else openTaskPrompt.classList.add("hidden");
 }
 
 function settingsClicked(project, e) {
@@ -237,7 +267,6 @@ function settingsClicked(project, e) {
   // Click the same settings again.
   if (openDialog === project) return;
   openDialog = project;
-
   const options = document.createElement("div");
   options.classList.add("options-panel");
   const renameProjectPara = document.createElement("p");
@@ -256,18 +285,20 @@ function settingsClicked(project, e) {
 }
 
 function deleteProject(project) {
-  for (let i = 3; i < projectsTab.children.length; i++) {
-    if (projectsTab.children[i].classList.contains("selected-tab")) {
-      projectsTab.removeChild(projectsTab.children[i]);
-      // There are 3 children that are not projects themselves. The project index inside the array is i - 3.
-      // Update data.
-      removeProject(i - 3);
-      console.log(projects);
-    }
-  }
+  removeProject(project.dataset.id);
+  // Clear projectTab and reload projects.
+  clearProjectTab();
+  loadProjects();
+  updateLocalStorageProjectList();
   openDialog = null;
   changeTab(todayTasksTab, true);
   project.onclick = null;
+}
+
+function clearProjectTab() {
+  while (projectsTab.children.length > 3) {
+    projectsTab.removeChild(projectsTab.lastChild);
+  }
 }
 
 function editProjectName(project) {
@@ -293,6 +324,7 @@ function removeDialog(el) {
 function renameProject() {
   // Update data.
   projectRenamer(openRename.children[1].textContent, renameInput.value);
+  updateLocalStorageProjectList();
   // Update html content.
   openRename.children[1].textContent = renameInput.value;
   cancelRename();
@@ -304,14 +336,81 @@ function cancelRename() {
   openRename = null;
 }
 
-function taskLoader(projectName) {
-  const project = findProject(projectname);
-  const tasks = project.getTasks();
-  for (task of tasks) {
+function taskDisplay() {
+  openTaskPrompt.classList.remove("hidden");
+  const project = findProjectById(currentTab.dataset.id);
+  taskLoaderProject(project.taskList);
+}
+
+function taskLoaderProject(taskList) {
+  for (let i = 0; i < taskList.length; i++) {
+    const task = taskList[i];
     const div = document.createElement("div");
+    const top = document.createElement("div");
+    const group = document.createElement("div");
+    group.classList.add("group");
+    top.classList.add("top");
+    const bottom = document.createElement("div");
+    bottom.classList.add("bottom");
     const taskNamePara = document.createElement("p");
+    taskNamePara.textContent = task.taskName;
+    taskNamePara.classList.add("task-name");
     const taskDetailsPara = document.createElement("p");
+    taskDetailsPara.classList.add("task-details");
+    taskDetailsPara.textContent = task.taskDetails;
     const taskDatePara = document.createElement("p");
-    const favoriteImg = document.createElement("img");
+    taskDatePara.textContent = task.taskDate || "no due date";
+    taskDatePara.classList.add("task-date");
+    const img = new Image();
+    img.src = task.isImportant ? Fav : Unimportant;
+    img.alt = "icon";
+    img.setAttribute("class", "star"); // change it to task logo class
+    const img2 = new Image();
+    img2.src = Settings;
+    img2.alt = "settings";
+    img2.setAttribute("class", "sets");
+    top.appendChild(taskNamePara);
+    group.appendChild(taskDatePara);
+    group.appendChild(img);
+    group.appendChild(img2);
+    div.classList.add("task");
+    top.appendChild(group);
+    div.appendChild(top);
+    bottom.appendChild(taskDetailsPara);
+    div.appendChild(bottom);
+    content.appendChild(div);
+  }
+}
+
+// Open task form.
+function clickOpenTaskPrompt() {
+  formTask.classList.remove("hidden");
+}
+
+function createTask() {
+  // NOTE: the task gets created in the last selected project.
+  const project = findProjectById(currentTab.dataset.id);
+  const task = {
+    taskName: taskNameInput.value,
+    taskDetails: taskDetailsInput.value,
+    taskDate: taskDateInput.value,
+    isImportant: false,
+  };
+  project.taskList.push(task);
+  updateLocalStorageProjectList();
+  cancelTaskPrompt();
+}
+
+// Hide task form and clear input fields.
+function cancelTaskPrompt() {
+  formTask.classList.add("hidden");
+  taskNameInput.value = "";
+  taskDetailsInput.value = "";
+  taskDateInput.value = "";
+}
+
+function clearContent() {
+  while (content.children.length > 3) {
+    content.removeChild(content.lastChild);
   }
 }
