@@ -181,15 +181,21 @@ input {
   align-items: center;
   width: 6rem;
   padding: 0.2rem 1rem;
-  background-color: #444444;
+  background-color: darkcyan;
   position: absolute;
   right: 6rem;
   top: -4rem;
+  border-radius: 1rem;
+}
+
+.options-panel > * {
+  margin: 0.2rem 0;
+  padding: 0.5rem 0.3rem;
+  width: 100%;
 }
 
 .options-panel > *:hover {
-  background-color: black;
-  color: goldenrod;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .add-task {

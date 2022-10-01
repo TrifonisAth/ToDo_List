@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../src/style.css" />
-    <script src="bundle.js" defer></script>
+    <script src="./index.js" defer></script>
     <title>Todo List</title>
   </head>
   <body>
@@ -50,12 +50,70 @@
               <img src="../src/add.png" alt="add" class="side-logo" id="add" />
               <p id="add-project">Add Project</p>
             </div>
+            <div class="project-prompt prompt hidden">
+              <input
+                type="text"
+                placeholder="Project Name"
+                name="project"
+                id="project"
+                maxlength="20"
+                autocomplete="off"
+              />
+              <div class="buttons">
+                <button class="green-btn green">Add</button
+                ><button class="red-btn red">Cancel</button>
+              </div>
+            </div>
+            <div class="rename-prompt prompt hidden">
+              <input
+                type="text"
+                placeholder="Project Name"
+                name="rename"
+                id="rename"
+                maxlength="20"
+                autocomplete="off"
+              />
+              <div class="buttons">
+                <button class="rename-btn green">Rename</button
+                ><button class="cancel-btn red">Cancel</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="content">
           <div class="title">
-            <p id="content-title">Content Title</p>
+            <p id="content-title"></p>
           </div>
+          <div class="add-task hidden">
+            <img
+              src="../src/add.png"
+              alt="add-task"
+              id="add-task"
+              class="side-logo"
+            />
+            <p class="add-task-para">Add Task</p>
+          </div>
+          <form class="hidden">
+            <p class="task-title">Title:</p>
+            <input
+              type="text"
+              placeholder="What to do?"
+              maxlength="30"
+              required
+            />
+            <p class="task-title">Details (optional):</p>
+            <input
+              type="text"
+              placeholder="Some datails about the task"
+              maxlength="30"
+            />
+            <p class="task-title">Date:</p>
+            <input type="date" maxlength="30" required />
+            <div class="buttons">
+              <button class="green">Add</button
+              ><button class="red" type="button">Cancel</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

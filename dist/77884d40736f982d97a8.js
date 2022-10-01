@@ -170,14 +170,6 @@ document.addEventListener("click", (e) => {
   if (!openDialog.contains(e.target)) removeDialog(openDialog);
 });
 
-function createProject() {
-  addProject(new Project(promptInput.value));
-  projectPrompt.classList.add("hidden");
-  promptInput.value = "";
-  updateLocalStorageId();
-  updateLocalStorageProjectList();
-  loadProjects("single");
-}
 // loadProjects();
 
 // Load the projects into html.
@@ -211,6 +203,15 @@ function loadProjects(arg) {
     if (arg === "single") break;
   }
   console.log(projects);
+}
+
+function createProject() {
+  addProject(new Project(promptInput.value));
+  projectPrompt.classList.add("hidden");
+  promptInput.value = "";
+  updateLocalStorageId();
+  updateLocalStorageProjectList();
+  loadProjects("single");
 }
 
 function contentDisplay(tab) {
