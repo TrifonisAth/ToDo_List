@@ -19,12 +19,18 @@ let currentId = localStorage.getObject("currentId") || 0;
 // Set value to empty array or localStorage saved, if it exists.
 let projects = localStorage.getObject("projectsList") || [];
 
+let currenTaskId = localStorage.getObject("currentTaskId") || 0;
+
 function updateLocalStorageProjectList() {
   localStorage.setObject("projectsList", projects);
 }
 
 function updateLocalStorageId() {
   localStorage.setItem("currentId", currentId);
+}
+
+function updateLocalTaskId() {
+  localStorage.setItem("currentTaskId", currenTaskId);
 }
 
 /////////////////////////////////////
@@ -348,6 +354,8 @@ function taskLoaderProject(taskList) {
     const div = document.createElement("div");
     const top = document.createElement("div");
     const group = document.createElement("div");
+    const check = document.createElement("input");
+    check.setAttribute("type", "checkbox");
     group.classList.add("group");
     top.classList.add("top");
     const bottom = document.createElement("div");
@@ -369,6 +377,7 @@ function taskLoaderProject(taskList) {
     img2.src = Settings;
     img2.alt = "settings";
     img2.setAttribute("class", "sets");
+    top.appendChild(check);
     top.appendChild(taskNamePara);
     group.appendChild(taskDatePara);
     group.appendChild(img);
@@ -395,10 +404,15 @@ function createTask() {
     taskDetails: taskDetailsInput.value,
     taskDate: taskDateInput.value,
     isImportant: false,
+    isCompleted: false,
+    taskId: currenTaskId++,
   };
   project.taskList.push(task);
+  updateLocalTaskId();
   updateLocalStorageProjectList();
   cancelTaskPrompt();
+  clearContent(); // Testing needed
+  taskDisplay(); // Testing needed.
 }
 
 // Hide task form and clear input fields.
