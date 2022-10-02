@@ -183,7 +183,7 @@ input {
   padding: 0.2rem 1rem;
   background-color: darkcyan;
   position: absolute;
-  right: 6rem;
+  right: 3rem;
   top: -4rem;
   border-radius: 1rem;
 }
@@ -224,9 +224,6 @@ form {
 form > .buttons {
   align-self: center;
 }
-.hidden {
-  display: none;
-}
 
 button {
   display: inline-flex;
@@ -236,6 +233,7 @@ button {
 }
 
 .task {
+  position: relative;
   display: flex;
   flex-direction: column;
   border: 0.2rem solid white;
@@ -276,4 +274,32 @@ button {
 input[type="checkbox"] {
   font-size: 2rem;
   justify-self: flex-start;
+}
+
+.tasks-panel {
+  position: absolute;
+  right: 2rem;
+  top: -5.5rem;
+  background-color: slategray;
+  display: flex;
+  flex-direction: column;
+  width: 4.5rem;
+  border-radius: 1rem;
+}
+
+.tasks-panel > * {
+  padding: 0.2rem 0.9rem;
+}
+
+.tasks-panel > * {
+  font-size: 0.9rem;
+}
+
+.tasks-panel > *:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
 }
