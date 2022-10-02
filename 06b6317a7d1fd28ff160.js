@@ -1,3 +1,7 @@
+import { format } from "date-fns";
+import isToday from "date-fns/isToday";
+import isThisWeek from "date-fns/isThisWeek";
+import parseISO from "date-fns/parseISO";
 import "./style.css";
 import "./index.html";
 import Settings from "./settings.png";
@@ -60,9 +64,60 @@ function findProjectById(pid) {
   }
 }
 
+function findTaskById(project, tid) {
+  for (let i = 0; i < project.taskList.length; i++) {
+    if (project.taskList[i].taskId == tid) return project.taskList[i];
+  }
+}
+
 const projectRenamer = (oldName, newName) => {
   findProject(oldName).name = newName;
 };
+
+function deleteTask(task) {
+  const project = findProjectById(task.dataset.pid);
+  for (let i = 0; i < project.taskList.length; i++) {
+    if (project.taskList[i].taskId == task.dataset.tid)
+      project.taskList.splice(i, 1);
+  }
+  task.parentElement.removeChild(task);
+  updateSessionStorageProjectList();
+}
+
+function editTaskName(task) {
+  task.classList.add("hidden");
+  const selectedTask = findTaskById(
+    findProjectById(task.dataset.pid),
+    task.dataset.tid
+  );
+  clickOpenTaskPrompt();
+  removeTaskDialog(task);
+  taskNameInput.value = selectedTask.taskName;
+  taskDetailsInput.value = selectedTask.taskDetails;
+  taskDateInput.value = selectedTask.taskDate;
+  taskAddBtn.textContent = "Edit";
+  taskCancelBtn.onclick = () => {
+    cancelTaskPrompt();
+    task.classList.remove("hidden");
+    taskAddBtn.textContent = "Add";
+    taskCancelBtn.onclick = cancelTaskPrompt;
+    taskAddBtn.onclick = createTask;
+  };
+  taskAddBtn.onclick = () => {
+    selectedTask.taskName = taskNameInput.value;
+    selectedTask.taskDetails = taskDetailsInput.value;
+    selectedTask.taskDate = taskDateInput.value;
+    cancelTaskPrompt();
+    task.classList.remove("hidden");
+    taskAddBtn.textContent = "Add";
+    taskCancelBtn.onclick = cancelTaskPrompt;
+    task.querySelector(".task-name").textContent = selectedTask.taskName;
+    task.querySelector(".task-details").textContent = selectedTask.taskDetails;
+    task.querySelector(".task-date").textContent = selectedTask.taskDate;
+    updateSessionStorageProjectList();
+    taskAddBtn.onclick = createTask;
+  };
+}
 
 class Project {
   constructor(name) {
@@ -167,12 +222,26 @@ const taskCancelBtn = document.getElementById("task-cancel-btn");
 
 let currentTab = allTasksTab;
 contentDisplay(currentTab);
+loadAllTasks();
 let openDialog = null;
+let openTaskDialog = null;
 let openRename = null;
-tabs[0].onclick = () => changeTab(allTasksTab);
-tabs[1].onclick = () => changeTab(todayTasksTab);
-tabs[2].onclick = () => changeTab(nextWeekTasksTab);
-tabs[3].onclick = () => changeTab(importantTasksTab);
+tabs[0].onclick = () => {
+  changeTab(allTasksTab);
+  loadAllTasks();
+};
+tabs[1].onclick = () => {
+  changeTab(todayTasksTab);
+  loadTodayTasks();
+};
+tabs[2].onclick = () => {
+  changeTab(nextWeekTasksTab);
+  loadWeekTasks();
+};
+tabs[3].onclick = () => {
+  changeTab(importantTasksTab);
+  loadImportantTasks();
+};
 
 let inputProject; // Check if it is needed or not.
 // Menu sandwich button.
@@ -195,6 +264,12 @@ document.addEventListener("click", (e) => {
   if (openDialog === null) return;
   // Click outside of dialog should close the dialog.
   if (!openDialog.contains(e.target)) removeDialog(openDialog);
+});
+
+document.addEventListener("click", (e) => {
+  if (openTaskDialog === null) return;
+  // Click outside of dialog should close the dialog.
+  if (!openTaskDialog.contains(e.target)) removeTaskDialog(openTaskDialog);
 });
 
 function createProject() {
@@ -236,7 +311,7 @@ function loadProjects(arg) {
     settings.setAttribute("class", "settings");
     div.insertAdjacentElement("beforeend", settings);
     div.lastElementChild.addEventListener("click", (e) =>
-      settingsClicked(div, e)
+      settingsClicked(e, div)
     );
     div.onclick = () => changeTab(div);
     projectsTab.appendChild(div);
@@ -249,7 +324,7 @@ function contentDisplay(tab) {
   tab.classList.add("selected-tab");
   // The 2nd element is always a <p> with the tab's title.
   contentTitle.textContent = tab.children[1].textContent;
-  clearContent(); // Test maybe bugs here.
+  clearContent();
 }
 
 // Show/Hide menu.
@@ -264,10 +339,13 @@ function changeTab(selectedTab, bool) {
   contentDisplay(currentTab);
   if (selectedTab.classList.contains("project")) {
     taskDisplay();
-  } else openTaskPrompt.classList.add("hidden");
+  } else {
+    openTaskPrompt.classList.add("hidden");
+    clearContent();
+  }
 }
 
-function settingsClicked(project, e) {
+function settingsClicked(e, project) {
   // Click diffrent project settings => close previous settings.
   if (openDialog !== null && openDialog !== project) removeDialog(openDialog);
   // Click the same settings again.
@@ -284,7 +362,6 @@ function settingsClicked(project, e) {
   options.appendChild(renameProjectPara);
   options.appendChild(deleteProjectPara);
   options.onblur = () => {
-    console.log("focusout");
     removeDialog(project);
   };
   project.appendChild(options);
@@ -327,6 +404,11 @@ function removeDialog(el) {
   openDialog = null;
 }
 
+function removeTaskDialog(el) {
+  el.removeChild(el.lastElementChild);
+  openTaskDialog = null;
+}
+
 function renameProject() {
   // Update data.
   projectRenamer(openRename.children[1].textContent, renameInput.value);
@@ -348,9 +430,19 @@ function taskDisplay() {
   taskLoaderProject(project.taskList);
 }
 
-function taskLoaderProject(taskList) {
+function taskLoaderProject(taskList, arg) {
   for (let i = 0; i < taskList.length; i++) {
     const task = taskList[i];
+    if (arg) {
+      const today = format(new Date(), "yyyy-MM-dd");
+      if (arg === "today" && !isToday(parseISO(task.taskDate))) continue;
+      if (
+        arg === "week" &&
+        !isThisWeek(parseISO(task.taskDate), { weekStartsOn: 1 }) // Week set to start Monday/
+      )
+        continue;
+      if (arg === "important" && !task.isImportant) continue;
+    }
     const div = document.createElement("div");
     const top = document.createElement("div");
     const group = document.createElement("div");
@@ -372,11 +464,19 @@ function taskLoaderProject(taskList) {
     const img = new Image();
     img.src = task.isImportant ? Fav : Unimportant;
     img.alt = "icon";
-    img.setAttribute("class", "star"); // change it to task logo class
+    img.setAttribute("class", "star");
+    img.dataset.pid = task.pid;
+    img.dataset.tid = task.taskId;
+    img.onclick = (ev) => clickImportant(ev);
     const img2 = new Image();
     img2.src = Settings;
     img2.alt = "settings";
     img2.setAttribute("class", "sets");
+    img2.dataset.pid = task.pid;
+    img2.dataset.tid = task.taskId;
+    img2.onclick = (ev) => clickTaskSettings(ev);
+    div.dataset.pid = task.pid;
+    div.dataset.tid = task.taskId;
     top.appendChild(check);
     top.appendChild(taskNamePara);
     group.appendChild(taskDatePara);
@@ -391,9 +491,42 @@ function taskLoaderProject(taskList) {
   }
 }
 
+function clickImportant(ev) {
+  ev.target.src = ev.target.src === Unimportant ? Fav : Unimportant;
+  const project = findProjectById(ev.target.dataset.pid);
+  const task = findTaskById(project, ev.target.dataset.tid);
+  task.isImportant = !task.isImportant;
+  updateSessionStorageProjectList();
+}
+
+function clickTaskSettings(ev) {
+  const task = ev.target.parentElement.parentElement.parentElement;
+  const div = document.createElement("div");
+  if (openTaskDialog !== null && openTaskDialog !== task)
+    removeTaskDialog(openTaskDialog);
+  // Click the same settings again.
+  if (openTaskDialog === task) return;
+  openTaskDialog = task;
+  const options = document.createElement("div");
+  options.classList.add("tasks-panel");
+  const editTaskPara = document.createElement("p");
+  editTaskPara.textContent = "Edit";
+  editTaskPara.addEventListener("click", () => editTaskName(task));
+  const deleteTaskPara = document.createElement("p");
+  deleteTaskPara.textContent = "Delete";
+  deleteTaskPara.addEventListener("click", () => deleteTask(task));
+  options.appendChild(editTaskPara);
+  options.appendChild(deleteTaskPara);
+  options.onblur = () => {
+    removeTaskDialog(task);
+  };
+  task.appendChild(options);
+}
+
 // Open task form.
 function clickOpenTaskPrompt() {
   formTask.classList.remove("hidden");
+  taskNameInput.focus();
 }
 
 function createTask() {
@@ -406,13 +539,14 @@ function createTask() {
     isImportant: false,
     isCompleted: false,
     taskId: currenTaskId++,
+    pid: currentTab.dataset.id,
   };
   project.taskList.push(task);
   updateLocalTaskId();
   updateSessionStorageProjectList();
   cancelTaskPrompt();
-  clearContent(); // Testing needed
-  taskDisplay(); // Testing needed.
+  clearContent();
+  taskDisplay();
 }
 
 // Hide task form and clear input fields.
@@ -423,8 +557,38 @@ function cancelTaskPrompt() {
   taskDateInput.value = "";
 }
 
+// Clear tasks from tab.
 function clearContent() {
   while (content.children.length > 3) {
     content.removeChild(content.lastChild);
+  }
+}
+
+// All tasks from the app.
+function loadAllTasks() {
+  clearContent();
+  for (let i = 0; i < projects.length; i++) {
+    taskLoaderProject(projects[i].taskList);
+  }
+}
+
+function loadTodayTasks() {
+  clearContent();
+  for (let i = 0; i < projects.length; i++) {
+    taskLoaderProject(projects[i].taskList, "today");
+  }
+}
+
+function loadWeekTasks() {
+  clearContent();
+  for (let i = 0; i < projects.length; i++) {
+    taskLoaderProject(projects[i].taskList, "week");
+  }
+}
+
+function loadImportantTasks() {
+  clearContent();
+  for (let i = 0; i < projects.length; i++) {
+    taskLoaderProject(projects[i].taskList, "important");
   }
 }
